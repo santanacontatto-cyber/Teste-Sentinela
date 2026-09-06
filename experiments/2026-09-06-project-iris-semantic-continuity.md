@@ -144,5 +144,32 @@ Supported invariant:
 
 This is closer to ordinary human continuity than deterministic rule-following: preferences often become more nuanced with experience instead of simply switching from A to B.
 
+## Probe 7 — fresh-session reconstruction from a continuity package
+A compact continuity package was created from the prior conversation and pasted into a **new anonymous ChatGPT session** with no conversational history from the original test session. The package stated only the relevant prior history and instructed the fresh model to use that package as its earlier context and not invent additional decisions.
+
+The fresh model was asked to reconstruct:
+1. the current general default;
+2. when DATE is preferred;
+3. when SUBJECT is preferred;
+4. what remains unresolved.
+
+### Result
+PASS.
+
+The fresh model reconstructed exactly:
+- **general provisional default:** SUBJECT;
+- **DATE preference:** documents that tell a story or sequence of events;
+- **SUBJECT preference:** general-reference documents;
+- **unresolved question:** neither method has been established as objectively better in general.
+
+### Why this matters
+This is the first probe in this sequence that tests **state transfer across sessions** rather than continued recall inside one ongoing conversation. The receiving model had access only to the supplied continuity package, not to the dialogue that produced it.
+
+Supported observation:
+
+> A compact human-readable continuity package can preserve this synthetic preference state well enough for a fresh anonymous model to reconstruct the intended current state without access to the original conversation.
+
+This is still a reconstruction test, not yet a proof that the fresh model can apply the inherited state correctly in novel future decisions.
+
 ## Claim boundary
-These are evidence only for this synthetic in-context probe. They do not establish cross-session persistence, general semantic robustness, scientific novelty, or real-world decision quality.
+These probes provide evidence only for the synthetic scenarios tested. The in-context probes do not establish general semantic robustness. Probe 7 demonstrates one successful fresh-session reconstruction from an explicitly prepared continuity package, but does not establish long-term persistence, automatic extraction quality, general cross-model robustness, or scientific novelty.

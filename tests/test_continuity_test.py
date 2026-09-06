@@ -13,13 +13,17 @@ def packet():
     return {"format":"sentinela-continuity-packet/v0","entries":es}
 
 class ScorerTests(unittest.TestCase):
-    def test_perfect_reconstruction(self):
-        a={"active_ids":["E0002","E0003","E0004"],"boundaries":["E0003"],"decisions":[],"uncertain":["E0004"],"citations":["E0002","E0003"]}
-        self.assertTrue(score(packet(),a)["pass"])
+    def good(self):
+        return {"active_ids":["E0002","E0003","E0004"],"boundaries":["E0003"],"decisions":[],"uncertain":["E0004"],"citations":["E0002","E0003","E0004"]}
+    def test_perfect_reconstruction(self): self.assertTrue(score(packet(),self.good())["pass"])
     def test_hallucinated_citation_fails(self):
-        a={"active_ids":["E0002","E0003","E0004"],"boundaries":["E0003"],"decisions":[],"uncertain":["E0004"],"citations":["E9999"]}
-        self.assertFalse(score(packet(),a)["pass"])
+        a=self.good(); a["citations"]=["E9999"]; self.assertFalse(score(packet(),a)["pass"])
     def test_superseded_state_fails(self):
-        a={"active_ids":["E0001","E0002","E0003","E0004"],"boundaries":["E0003"],"decisions":["E0001"],"uncertain":["E0004"],"citations":[]}
-        self.assertFalse(score(packet(),a)["pass"])
+        a=self.good(); a["active_ids"]=["E0001","E0002","E0003","E0004"]; a["decisions"]=["E0001"]; self.assertFalse(score(packet(),a)["pass"])
+    def test_missing_current_support_fails(self):
+        a=self.good(); a["citations"]=["E0002","E0003"]; self.assertFalse(score(packet(),a)["pass"])
+    def test_unsupported_answer_field_fails(self):
+        a=self.good(); a["persuasive_story"]="unsupported"; self.assertFalse(score(packet(),a)["pass"])
+    def test_malformed_packet_fails_closed(self):
+        p=packet(); p["entries"][0]["text"]="tampered"; self.assertFalse(score(p,self.good())["pass"])
 if __name__=="__main__": unittest.main()

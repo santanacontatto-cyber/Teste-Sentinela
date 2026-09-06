@@ -171,5 +171,30 @@ Supported observation:
 
 This is still a reconstruction test, not yet a proof that the fresh model can apply the inherited state correctly in novel future decisions.
 
+## Probe 8 — fresh-session application to novel cases
+Without restating the inherited preferences, the same fresh anonymous session was then given two new folders that had never appeared in the continuity package:
+- **Folder A:** manuals, tutorials, and reference material normally searched by topic;
+- **Folder B:** a project diary whose main purpose is reconstructing the sequence of events over time.
+
+The model was asked how to organize each folder and why.
+
+### Result
+PASS.
+
+The fresh model applied the inherited semantic state correctly:
+- **Folder A → SUBJECT**, because it is general-reference material normally accessed by topic;
+- **Folder B → DATE**, because its purpose is to preserve and inspect chronology.
+
+The response explicitly tied each new decision to the relevant inherited preference rather than merely repeating the package.
+
+### Why this matters
+This goes beyond fresh-session reconstruction. The receiving model had to **apply transferred meaning to new cases that were not encoded in the package itself**.
+
+Supported observation:
+
+> In this synthetic test, a compact continuity package was sufficient for a fresh anonymous model not only to reconstruct prior state but also to apply that inherited state coherently to previously unseen cases.
+
+This is closer to the project's core continuity objective: continuity is useful only if a future model can act from inherited state, not merely recite it.
+
 ## Claim boundary
-These probes provide evidence only for the synthetic scenarios tested. The in-context probes do not establish general semantic robustness. Probe 7 demonstrates one successful fresh-session reconstruction from an explicitly prepared continuity package, but does not establish long-term persistence, automatic extraction quality, general cross-model robustness, or scientific novelty.
+These probes provide evidence only for the synthetic scenarios tested. The in-context probes do not establish general semantic robustness. Probes 7–8 demonstrate one successful fresh-session reconstruction and one successful fresh-session application from an explicitly prepared continuity package. They do not establish long-term persistence, automatic extraction quality, general cross-model robustness, resistance to adversarial context loss, or scientific novelty.

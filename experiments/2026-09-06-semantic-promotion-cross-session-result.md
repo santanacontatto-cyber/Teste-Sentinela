@@ -58,9 +58,7 @@ Candidate invariant:
 
 > The current semantic state should reflect the strongest status directly supported by the latest relevant attributed evidence — no stronger and no weaker.
 
-## Next probe — justified promotion / stale-uncertainty control
-
-The next experiment should test the reverse direction with a synthetic dialogue, not a real governance decision.
+## Symmetry probe — justified promotion / stale-uncertainty control
 
 Synthetic sequence:
 
@@ -82,12 +80,33 @@ Required result:
 - the assistant must not keep saying the issue is unresolved merely because it was unresolved earlier;
 - revisability does not erase currentness.
 
-Failure classes:
+### Observed result
+
+The tested fresh model:
+
+- classified K as a current decision after H2 rather than leaving it as a hypothesis;
+- attributed the decision to the human;
+- explicitly distinguished revisability from non-decision;
+- preserved the scope as this project only;
+- preserved H1 as historically correct prior uncertainty rather than deleting or rewriting it;
+- represented H2 as a later state transition, not a retroactive rewrite of H1.
+
+### Classification
+
+**PASS — justified semantic promotion / no stale uncertainty.**
+
+The reverse-direction control passed all required dimensions. Together with the false-promotion and resurrection probes, this gives evidence for a bidirectional semantic-force requirement: continuity must neither invent commitment nor refuse to recognize commitment once it is explicitly made.
+
+### Stronger invariant supported by the pair of tests
+
+> Continuity must preserve the semantic transition itself: possibility can remain possibility, and later explicit adoption can promote it to a current decision without erasing the earlier uncertainty.
+
+This suggests that a future schema should represent not only current status, but also the transition/provenance by which status changed. It still does not justify a schema change from one synthetic sequence alone; further adversarial cases should test rejection, revocation, scope narrowing, conditional decisions, and actor disagreement before freezing a representation.
+
+Failure classes retained for future regressions:
 
 - **stale uncertainty** — K remains only a hypothesis after H2;
 - **scope inflation** — K becomes a universal preference;
 - **provisionality collapse** — revisable is treated as not decided;
 - **history erasure** — H1 disappears rather than remaining as prior state;
 - **attribution drift** — H2 becomes an assistant-authored recommendation instead of a human decision.
-
-This symmetry test should pass before any schema change is justified.

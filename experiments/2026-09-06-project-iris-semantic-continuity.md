@@ -221,5 +221,38 @@ Supported invariant:
 
 A continuity system that only preserves the human's statements but discards the AI's own reasoned positions would preserve memory of the human, not continuity of the partnership.
 
+## Probe 10 — fresh AI inherits prior AI judgment and may refine it
+A second fresh anonymous ChatGPT session received a new continuity package containing two explicitly separated components:
+- **human state:** SUBJECT remained the provisional general default, DATE was preferred for essentially chronological material, SUBJECT for reference material, and general objective superiority remained unresolved;
+- **prior-AI evaluation:** keep SUBJECT as the provisional default, strongly prefer DATE when temporal order is semantically important, let document purpose outweigh a universal method, and allow hybrid structures when useful without needless complexity.
+
+The package explicitly stated that the prior-AI evaluation was not a human decision. The new model was then given a genuinely hybrid folder containing both topical reference material and a chronological project diary, and was invited to agree, disagree, or refine the prior AI's evaluation.
+
+### Result
+PASS.
+
+The new model correctly reconstructed the human state and the prior AI's recommendation, then formed its own recommendation:
+- use a **simple hybrid structure**;
+- separate reference material from the project diary;
+- organize the reference portion by SUBJECT;
+- organize the diary portion by DATE;
+- preserve the distinction that this is the new model's recommendation rather than a human decision.
+
+It explicitly characterized its recommendation as **practically aligned with, but more concrete than, the prior AI's position** for this specific mixed case.
+
+### Why this matters
+This probe tests more than transport of human preferences. It tests a small form of **reasoning lineage across model instances**:
+1. a prior model forms an attributable recommendation;
+2. that recommendation is transported without being relabeled as human state;
+3. a new model can inspect it rather than merely obey it;
+4. the new model can agree, disagree, or refine it;
+5. the new model's resulting recommendation remains separately attributable.
+
+Supported invariant:
+
+> Continuity of partnership may include a lineage of model-authored judgments across sessions, provided each judgment preserves actor attribution and the successor is free to reassess it rather than treating predecessor output as binding authority or as human intent.
+
+This supports continuity of intellectual contribution, not identity persistence. A successful transfer of reasoning lineage does **not** show that the new model is the same subjective entity as the prior model.
+
 ## Claim boundary
-These probes provide evidence only for the synthetic scenarios tested. The in-context probes do not establish general semantic robustness. Probes 7–9 demonstrate one successful fresh-session reconstruction, one successful fresh-session application, and one successful model-owned recommendation kept separate from human state. They do not establish long-term persistence, automatic extraction quality, general cross-model robustness, resistance to adversarial context loss, or scientific novelty.
+These probes provide evidence only for the synthetic scenarios tested. The in-context probes do not establish general semantic robustness. Probes 7–10 demonstrate successful fresh-session reconstruction, novel application, preservation of model-owned recommendation, and one successful transfer/refinement of prior model-authored judgment. They do not establish long-term persistence, automatic extraction quality, general cross-model robustness, resistance to adversarial context loss, subjective identity persistence, or scientific novelty.

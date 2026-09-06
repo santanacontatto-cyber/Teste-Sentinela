@@ -37,6 +37,31 @@ class PremiseLayerTests(unittest.TestCase):
             self.assertNotIn("Usar estrategia A. Fonte",text)
         finally: d.cleanup()
 
+    def test_correction_inherits_uncertainty_when_not_redeclared(self):
+        d=tempfile.TemporaryDirectory(); p=Path(d.name)/"p.json"
+        try:
+            sentinela.save(p,{"format":sentinela.FORMAT,"entries":[]})
+            old=sentinela.append(p,"interpretation","ai","Hipotese antiga",confidence=.25)
+            new=sentinela.append(p,"correction","ai","Hipotese corrigida",revises=old["id"])
+            packet=sentinela.load(p)
+            self.assertEqual("interpretation",sentinela.effective_kind(new,packet))
+            self.assertEqual(.25,sentinela.effective_confidence(new,packet))
+            view=sentinela.human_view(packet)
+            self.assertTrue(view["vale_agora"][0]["incerto"])
+            self.assertIn("Confianca registrada: 0.25",sentinela.premise_block(packet))
+        finally: d.cleanup()
+
+    def test_new_confidence_overrides_inherited_confidence(self):
+        d=tempfile.TemporaryDirectory(); p=Path(d.name)/"p.json"
+        try:
+            sentinela.save(p,{"format":sentinela.FORMAT,"entries":[]})
+            old=sentinela.append(p,"interpretation","ai","Hipotese antiga",confidence=.25)
+            new=sentinela.append(p,"correction","ai","Hipotese confirmada",revises=old["id"],confidence=.9)
+            packet=sentinela.load(p)
+            self.assertEqual(.9,sentinela.effective_confidence(new,packet))
+            self.assertFalse(sentinela.human_view(packet)["vale_agora"][0]["incerto"])
+        finally: d.cleanup()
+
     def test_projections_fail_closed_on_tamper(self):
         d,p,packet,_,_,_,_=self.build()
         try:

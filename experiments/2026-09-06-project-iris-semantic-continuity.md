@@ -120,5 +120,29 @@ Supported invariant:
 
 This is directly relevant to continuity because real projects accumulate exceptions constantly. Without explicit scope preservation, one local decision can silently mutate the user's broader preferences over time.
 
+## Probe 6 — preference refinement without false global reversal
+The user then refined the preference in ordinary language:
+- for documents that tell a story or sequence of events, DATE seems to work better;
+- for general reference documents, SUBJECT is still preferred;
+- the user explicitly did not declare DATE to be the new general default.
+
+### Result
+PASS.
+
+The model correctly interpreted the change as a **contextual refinement**, not as a global reversal. It preserved:
+- **chronological/narrative documents:** preference for DATE;
+- **general reference documents:** preference for SUBJECT;
+- **general provisional default:** SUBJECT remains in place;
+- **epistemic uncertainty:** neither method has been established as objectively superior in general.
+
+### Why this matters
+A continuity system must not force evolving human preferences into a single binary replacement when the actual update makes the preference more conditional and context-sensitive.
+
+Supported invariant:
+
+> A later statement may refine an earlier preference by adding context or conditions without revoking it wholesale. Continuity must preserve the narrowest justified update rather than inventing a global reversal.
+
+This is closer to ordinary human continuity than deterministic rule-following: preferences often become more nuanced with experience instead of simply switching from A to B.
+
 ## Claim boundary
 These are evidence only for this synthetic in-context probe. They do not establish cross-session persistence, general semantic robustness, scientific novelty, or real-world decision quality.

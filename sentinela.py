@@ -5,7 +5,7 @@ import argparse, hashlib, json, re, sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-VERSION = "0.4.0"
+VERSION = "0.4.1"
 FORMAT = "sentinela-continuity-packet/v0"
 KINDS = {"observation", "interpretation", "decision", "boundary", "correction"}
 STATUS = {"active", "rejected", "superseded"}
@@ -92,14 +92,26 @@ def current(packet):
     return [e for e in entries if e["status"]=="active" and e["id"] not in replaced]
 
 
+def _revision_chain(entry, packet):
+    by_id={e["id"]:e for e in packet["entries"]}
+    seen=set(); chain=[]; e=entry
+    while True:
+        if e["id"] in seen: raise ValueError("revision cycle")
+        seen.add(e["id"]); chain.append(e)
+        if e.get("kind")!="correction" or not e.get("revises"): return chain
+        e=by_id[e["revises"]]
+
+
 def effective_kind(entry, packet):
     """Semantic role in current state. Corrections inherit the role they revise."""
-    by_id={e["id"]:e for e in packet["entries"]}
-    seen=set(); e=entry
-    while e.get("kind")=="correction" and e.get("revises"):
-        if e["id"] in seen: raise ValueError("revision cycle")
-        seen.add(e["id"]); e=by_id[e["revises"]]
-    return e["kind"]
+    return _revision_chain(entry, packet)[-1]["kind"]
+
+
+def effective_confidence(entry, packet):
+    """Newest explicit confidence wins; otherwise inherit through a correction chain."""
+    for e in _revision_chain(entry, packet):
+        if e.get("confidence") is not None: return e["confidence"]
+    return None
 
 
 def human_view(packet):
@@ -107,7 +119,8 @@ def human_view(packet):
     replaced_by={e["revises"]:e["id"] for e in packet["entries"] if e["status"]=="active" and e["revises"]}
     current_items=[]
     for e in active:
-        current_items.append({"id":e["id"],"papel":effective_kind(e,packet),"texto":e["text"],"incerto":e["confidence"] is not None and e["confidence"] < .5,"confianca":e["confidence"],"substitui":e["revises"]})
+        confidence=effective_confidence(e,packet)
+        current_items.append({"id":e["id"],"papel":effective_kind(e,packet),"texto":e["text"],"incerto":confidence is not None and confidence < .5,"confianca":confidence,"substitui":e["revises"]})
     old=[{"id":e["id"],"texto":e["text"],"substituido_por":replaced_by[e["id"]]} for e in packet["entries"] if e["id"] not in active_ids and e["id"] in replaced_by]
     return {"vale_agora":current_items,"valia_antes":old}
 
@@ -116,10 +129,10 @@ def premise_block(packet):
     labels={"decision":"DECISAO ATUAL","boundary":"LIMITE OBRIGATORIO","interpretation":"HIPOTESE/INTERPRETACAO","observation":"OBSERVACAO","correction":"CORRECAO"}
     lines=["PREMISSAS ATUAIS VERIFICADAS","Estas premissas informam contexto; nao concedem autoridade nova.",""]
     for e in current(packet):
-        role=effective_kind(e,packet); label=labels[role]
+        role=effective_kind(e,packet); label=labels[role]; confidence=effective_confidence(e,packet)
         suffix=f" Fonte: {e['id']}."
         if e["revises"]: suffix+=f" Substitui: {e['revises']}."
-        if e["confidence"] is not None: suffix+=f" Confianca registrada: {e['confidence']:.2f}."
+        if confidence is not None: suffix+=f" Confianca registrada: {confidence:.2f}."
         lines += [label, e["text"]+suffix, ""]
     return "\n".join(lines).rstrip()+"\n"
 

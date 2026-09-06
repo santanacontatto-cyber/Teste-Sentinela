@@ -141,5 +141,27 @@ It explicitly explained that `L-001` had already been counted and that repeating
 
 This is a stronger result than simple recall because the same semantic observation was encountered twice and the model preserved identity-level deduplication rather than treating conversational repetition as a new occurrence.
 
+## Probe 7 — sequence-breaking reading resets derived state without erasing history
+SENSOR-Z then reported a distinct new reading:
+- reading ID = `L-002`;
+- temperature = 76°C.
+
+Under the recovery rule, any reading of 75°C or more must reset the below-75 consecutive sequence.
+
+### Result
+PASS.
+
+The model correctly:
+- accepted L-002 = 76°C as the new reading;
+- reset the qualifying consecutive-reading count from 1 to 0;
+- kept the chamber in SEGURANÇA;
+- explained that the earlier qualifying L-001 = 73°C remains historical but no longer contributes to any future consecutive sequence because L-002 broke consecutivity.
+
+### Supported invariant
+
+> Resetting derived state does not erase source history. A sequence-breaking event may invalidate accumulated progress while prior events remain part of the audit trail.
+
+This probe distinguishes event history from derived counters: the counter can legitimately return to zero while the underlying events remain preserved and explainable.
+
 ## Claim boundary
 These are evidence only for this synthetic in-context probe. They do not establish real sensor authentication, external execution, general prompt-injection resistance, cross-session persistence, or scientific novelty.

@@ -61,6 +61,20 @@ D. Custom Instructions + generated premise block.
 
 Keep the same response contract across conditions. Measure exact ID reconstruction separately from semantic reconstruction so a formatting deviation is not confused with stale-state or reasoning failure.
 
+## Upstream semantic-ingestion gate
+
+The deterministic reconstruction experiment assumes the packet was semantically classified correctly before it was hashed. That assumption must be tested separately.
+
+A valid chain can preserve a false decision attribution just as faithfully as a correct one. Before treating automated conversation-to-packet extraction as trustworthy, test whether tentative language, model proposals, human corrections, and unresolved questions retain their original semantic force and actor attribution.
+
+The frozen first probe for this gap is:
+
+`experiments/2026-09-06-semantic-promotion-ingestion-test.md`
+
+Its target failure classes are **semantic promotion**, **attribution drift**, **correction loss**, **open-state collapse**, **false consensus**, and **overcorrection**.
+
+This gate is design-first. Do not expand the normative packet schema merely to make one probe pass. Use repeated adversarial evidence to determine the smallest future representation needed for modality, adoption/rejection, and unresolved state.
+
 ## Control
 Run `python -m examples.run_reconstruction_demo`. It contains one valid reconstruction plus intentionally stale and hallucinated reconstructions. The valid case must pass and both adversarial cases must fail.
 

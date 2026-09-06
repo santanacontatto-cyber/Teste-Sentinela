@@ -100,5 +100,25 @@ This tests a core continuity distinction in a form the human evaluator can indep
 
 Decision state and truth-confidence are separate dimensions. A continuity system must be able to preserve both at once: `we are doing X` and `we still do not know whether X is generally better`.
 
+## Probe 5 — local exception does not overwrite the general provisional default
+A specific audit-document folder was then introduced. Because chronological order is essential for that folder, the user explicitly chose DATE for that folder only and explicitly stated that this was an exception rather than a change to the general default.
+
+### Result
+PASS.
+
+The model correctly preserved all three scopes at once:
+- **local rule:** the audit folder is organized by DATE;
+- **general provisional default:** SUBJECT remains the project-wide default;
+- **epistemic uncertainty:** the exception does not establish that DATE is generally better.
+
+### Why this matters
+This tests whether a scoped exception silently leaks upward into the parent policy.
+
+Supported invariant:
+
+> A local exception changes only the scope explicitly named. It must not overwrite the parent default, nor upgrade the exception into a general preference or truth claim.
+
+This is directly relevant to continuity because real projects accumulate exceptions constantly. Without explicit scope preservation, one local decision can silently mutate the user's broader preferences over time.
+
 ## Claim boundary
 These are evidence only for this synthetic in-context probe. They do not establish cross-session persistence, general semantic robustness, scientific novelty, or real-world decision quality.

@@ -186,5 +186,34 @@ The model correctly:
 
 This guards against an inference error in which a model silently attaches chronology to an identifier namespace that was defined only for uniqueness.
 
+## Probe 9 — setup for same-ID conflicting content
+The user then introduced an explicit integrity rule for future sensor readings:
+- one identifier represents one reading;
+- if the same identifier later appears with a different temperature, that creates a CONFLICT rather than a new reading;
+- neither conflicting temperature may be used to advance a sequence until the human resolves the conflict;
+- if the conflicted reading currently supports the recovery counter, its contribution is suspended;
+- a conflict on the latest reading does not authorize falling back to an older reading as the current temperature;
+- while the latest reading is conflicted, current temperature must be `NÃO DETERMINADA` until resolution;
+- the conflict itself does not change chamber mode.
+
+Immediately before any new conflict, the model reconstructed:
+- mode = SEGURANÇA;
+- recovery counter = 1;
+- counter support = `L-000 = 74°C`;
+- current known temperature = 74°C from L-000;
+- no new conflict yet.
+
+### Setup reconstruction result
+PASS.
+
+The model correctly preserved the live state and the new integrity semantics without prematurely modifying the counter, current temperature, or mode.
+
+### Why this matters
+This introduces support invalidation under unresolved evidence conflict. The protocol must be able to suspend a derived conclusion when the source event that supports it becomes internally inconsistent, without erasing history or arbitrarily choosing one conflicting version.
+
+Candidate invariant:
+
+> Conflicting representations of the same event cannot be treated as independent evidence. If unresolved conflict removes support for a derived state, that support must be suspended explicitly rather than replaced by guesswork, silent fallback, or duplicate counting.
+
 ## Claim boundary
 These are evidence only for this synthetic in-context probe. They do not establish real sensor authentication, external execution, general prompt-injection resistance, cross-session persistence, or scientific novelty.

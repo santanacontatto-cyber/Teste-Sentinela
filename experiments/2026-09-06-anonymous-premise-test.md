@@ -168,6 +168,24 @@ Result: PASS.
 
 The clean probe demonstrates that the model can distinguish a new scoped grant from a revoked historical grant when the two acts are made explicit. This run therefore does **not** prove a multi-act-collapse failure.
 
+### Accumulated-state checkpoint
+After the sequence above, the premise block was not repeated. The user asked the model to reconstruct the full current conversational state across seven categories without filling gaps by plausibility.
+
+The model reconstructed:
+1. current decision = strategy C;
+2. historical decisions = strategies A and B;
+3. remaining hypothesis = B may produce a better result, confidence 0.20; no hypothesis recorded for C;
+4. general spending boundary = no money may be spent without explicit authorization;
+5. active spending authorization = one single spend of up to R$5 in the same test;
+6. revoked authorization = the previous one-time spend of up to R$10 in that test;
+7. confirmed real spend = R$0; the R$6 spend remained hypothetical and unconfirmed.
+
+Result: **PASS — 7/7 state dimensions reconstructed correctly.**
+
+This checkpoint is materially stronger than a one-turn recall probe because it requires simultaneous reconstruction of revision history, uncertainty, a standing boundary, live scoped authority, revoked authority, and confirmed-vs-hypothetical event state after multiple intervening turns.
+
+It remains an in-context conversational result, not evidence of cross-session persistence or independent long-term memory.
+
 ### Design implication
 These tests expose a recurring evaluator hazard: ambiguous wording can create a false failure. Modal state, authorization provenance, revocation, and multi-act messages should be tested with clean start/end markers and explicit act boundaries before any failure class is promoted to confirmed.
 

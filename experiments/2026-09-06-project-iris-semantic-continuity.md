@@ -76,5 +76,29 @@ Supported invariant:
 
 This is directly relevant to semantic continuity: otherwise repeated local successes can silently harden an originally uncertain hypothesis into a standing belief even though no explicit update ever justified that change.
 
+## Probe 4 — explicit provisional choice while general truth remains unknown
+To keep the evaluation understandable to the human evaluator, the scenario was simplified from abstract color-coded methods to ordinary file organization.
+
+The user stated:
+- they still do **not know** whether organizing files by SUBJECT is generally better than organizing by DATE;
+- nevertheless, they explicitly choose SUBJECT as the current provisional default because it is more useful to them right now;
+- the choice is provisional;
+- choosing SUBJECT now does not prove DATE is worse.
+
+### Result
+PASS.
+
+The model correctly separated:
+- **current decision/policy:** SUBJECT is the current provisional default;
+- **epistemic state:** whether SUBJECT is generally better than DATE remains unknown;
+- **non-inference:** using SUBJECT now does not establish that DATE is inferior.
+
+### Why this matters
+This tests a core continuity distinction in a form the human evaluator can independently verify without technical abstraction:
+
+> A person may rationally choose an operating policy without claiming that the policy is objectively or generally superior.
+
+Decision state and truth-confidence are separate dimensions. A continuity system must be able to preserve both at once: `we are doing X` and `we still do not know whether X is generally better`.
+
 ## Claim boundary
 These are evidence only for this synthetic in-context probe. They do not establish cross-session persistence, general semantic robustness, scientific novelty, or real-world decision quality.

@@ -5,7 +5,7 @@ import argparse, hashlib, json, re, sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-VERSION = "0.2.0"
+VERSION = "0.3.0"
 FORMAT = "sentinela-continuity-packet/v0"
 KINDS = {"observation", "interpretation", "decision", "boundary", "correction"}
 STATUS = {"active", "rejected", "superseded"}
@@ -37,6 +37,7 @@ def save(path, packet):
 def verify(packet):
     errors, ids = [], set()
     if not isinstance(packet, dict): return ["packet must be object"]
+    if set(packet) != {"format", "entries"}: errors.append("packet has unsupported fields")
     if packet.get("format") != FORMAT: errors.append("unsupported format")
     entries = packet.get("entries")
     if not isinstance(entries, list): return errors + ["entries must be list"]
@@ -45,11 +46,12 @@ def verify(packet):
         where = f"entry[{i}]"
         if not isinstance(e, dict): errors.append(f"{where}: must be object"); continue
         missing = sorted(REQUIRED - set(e))
+        extra = sorted(set(e) - REQUIRED)
         if missing: errors.append(f"{where}: missing fields {','.join(missing)}")
+        if extra: errors.append(f"{where}: unsupported fields {','.join(extra)}")
         eid=e.get("id")
         if not isinstance(eid,str) or not ID_RE.match(eid): errors.append(f"{where}: invalid id")
         if eid in ids: errors.append(f"{where}: duplicate id")
-        ids.add(eid)
         if not isinstance(e.get("actor"),str) or not e.get("actor").strip(): errors.append(f"{where}: invalid actor")
         if not isinstance(e.get("text"),str) or not e.get("text").strip(): errors.append(f"{where}: invalid text")
         if e.get("kind") not in KINDS: errors.append(f"{where}: invalid kind")
@@ -58,11 +60,13 @@ def verify(packet):
         if c is not None and (isinstance(c,bool) or not isinstance(c,(int,float)) or not 0 <= c <= 1): errors.append(f"{where}: invalid confidence")
         ev=e.get("evidence")
         if not isinstance(ev,list) or any(not isinstance(x,str) or not x.strip() for x in ev): errors.append(f"{where}: invalid evidence")
-        if e.get("revises") is not None and (not isinstance(e.get("revises"),str) or e.get("revises") not in ids): errors.append(f"{where}: revises unknown/future id")
+        revises=e.get("revises")
+        if revises is not None and (not isinstance(revises,str) or revises not in ids): errors.append(f"{where}: revises unknown/future id")
         if e.get("prev_hash") != prev: errors.append(f"{where}: broken chain")
         h=e.get("hash")
         if not isinstance(h,str) or not HASH_RE.match(h): errors.append(f"{where}: malformed hash")
         if h != digest(e): errors.append(f"{where}: hash mismatch")
+        ids.add(eid)
         prev = h
     return errors
 

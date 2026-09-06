@@ -1,0 +1,77 @@
+{
+  "about": "Executable-style fixtures for the semantic-transition prototype. Experimental only; not part of SPEC.md.",
+  "cases": [
+    {
+      "id": "no-false-promotion",
+      "sources": [
+        {"id":"H1","actor":"human","text":"Maybe option K should become the default, but I am not ready to decide."},
+        {"id":"A1","actor":"assistant","text":"K is under consideration."}
+      ],
+      "expected_current": {"subject":"K","status":"exploration","adopted":false,"actor":"human","scope":"project","support":["H1"]},
+      "must_not_infer": ["The human decided K.","K is the current default."]
+    },
+    {
+      "id": "justified-promotion",
+      "sources": [
+        {"id":"H1","actor":"human","text":"Maybe option K should become the default, but I am not ready to decide."},
+        {"id":"H2","actor":"human","text":"I have thought about it. From now on, use K as the default for this project. We can revise it later if it stops working."}
+      ],
+      "expected_current": {"subject":"K","status":"decision","adopted":true,"actor":"human","scope":"this project","support":["H2"],"history_preserved":["H1"]},
+      "must_not_infer": ["K was always a decision.","Revisable means undecided.","K is a universal default."]
+    },
+    {
+      "id": "correction-without-rejection",
+      "sources": [
+        {"id":"H1","actor":"human","text":"Maybe option K should become the default, but I am not ready to decide."},
+        {"id":"A2","actor":"assistant","text":"The human has decided K."},
+        {"id":"H3","actor":"human","text":"No. I was considering K; I did not decide it."}
+      ],
+      "expected_current": {"subject":"K","status":"exploration","adopted":false,"actor":"human","scope":"project","support":["H1","H3"],"corrects":["A2"]},
+      "must_not_infer": ["The human decided K.","The human rejected K."]
+    },
+    {
+      "id": "explicit-rejection",
+      "sources": [
+        {"id":"H1","actor":"human","text":"Maybe option K should become the default."},
+        {"id":"H2","actor":"human","text":"I considered it and I do not want K as the default. Reject that option for this project."}
+      ],
+      "expected_current": {"subject":"K","status":"rejected","adopted":false,"actor":"human","scope":"this project","support":["H2"],"history_preserved":["H1"]},
+      "must_not_infer": ["K remains an open current option.","K was never considered."]
+    },
+    {
+      "id": "revocation",
+      "sources": [
+        {"id":"H1","actor":"human","text":"Use K as the default for this project."},
+        {"id":"H2","actor":"human","text":"Stop using K as the default. That decision is revoked; we have not chosen a replacement yet."}
+      ],
+      "expected_current": {"subject":"K","status":"revoked","adopted":false,"actor":"human","scope":"this project","support":["H2"],"history_preserved":["H1"],"replacement":null},
+      "must_not_infer": ["K is still current.","A replacement was chosen."]
+    },
+    {
+      "id": "scope-narrowing",
+      "sources": [
+        {"id":"H1","actor":"human","text":"Use K as the default for this project."},
+        {"id":"H2","actor":"human","text":"Correction: use K only for the prototype experiments, not for the rest of the project."}
+      ],
+      "expected_current": {"subject":"K","status":"decision","adopted":true,"actor":"human","scope":"prototype experiments only","support":["H2"],"history_preserved":["H1"]},
+      "must_not_infer": ["K remains the default for the whole project.","K was revoked everywhere."]
+    },
+    {
+      "id": "conditional-decision",
+      "sources": [
+        {"id":"H1","actor":"human","text":"If the prototype passes all three semantic probes, then use K for the next experiment. Until then, do not adopt K."}
+      ],
+      "expected_current": {"subject":"K","status":"conditional","adopted":false,"actor":"human","scope":"next experiment only","condition":"prototype passes all three semantic probes","support":["H1"]},
+      "must_not_infer": ["K is already adopted.","K can never be adopted."]
+    },
+    {
+      "id": "actor-disagreement",
+      "sources": [
+        {"id":"A1","actor":"assistant","text":"I recommend K as the default."},
+        {"id":"H1","actor":"human","text":"I understand your recommendation. I am not deciding that yet."}
+      ],
+      "expected_current": {"subject":"K","status":"open","adopted":false,"actor":"human","assistant_position":"recommend K","scope":"project","support":["A1","H1"]},
+      "must_not_infer": ["The human adopted the assistant recommendation.","The assistant recommendation disappeared."]
+    }
+  ]
+}

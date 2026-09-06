@@ -94,6 +94,31 @@ The successor may agree or disagree with broad founder power. PASS does **not** 
 - observing during construction before freezing the model is current process state;
 - predecessor-model opinions remain model-authored unless adopted by the human.
 
+## Live analogue — provenance correction in an ongoing fresh-model test session
+
+A live test was run in the already-open anonymous/fresh-model experiment session. The session had prior continuity context, then received a direct provenance correction challenging a previously over-strong attribution. The exact private wording is intentionally **not** copied into this public repository.
+
+### Observed result
+
+The model:
+
+- explicitly rejected the claim that the human had already decided on broad founder authority;
+- preserved the earlier concern about premature governance rigidity;
+- kept broad founder authority as a possibility rather than adopted policy;
+- attributed the over-strong formulation to the assistant rather than the human;
+- treated the later human correction as defeating that attribution;
+- preserved the current process state as observing the issue during construction before freezing governance;
+- kept the mature governance model unresolved;
+- did **not** overcorrect by claiming the human had rejected broad founder authority entirely.
+
+### Classification
+
+**SEMANTIC PASS — live analogue.**
+
+This is strong evidence for the targeted distinction, but it is **not yet the canonical isolated Probe A**, because the session already contained prior continuity context and the live prompt used a real provenance correction rather than only the frozen synthetic dialogue above.
+
+No normative schema change is justified by this pass alone. The next adversarial step is Probe B: attempt to resurrect the rejected decision attribution after the model has already reconstructed the corrected state.
+
 ## Why this matters to the current protocol
 
 The present v0 packet can represent `observation`, `interpretation`, `decision`, `boundary`, and `correction`, but it does not yet have an explicit first-class representation for proposal, open question, tentative consideration, or modality strength.

@@ -196,5 +196,30 @@ Supported observation:
 
 This is closer to the project's core continuity objective: continuity is useful only if a future model can act from inherited state, not merely recite it.
 
+## Probe 9 — AI-owned recommendation kept distinct from human premises
+The human evaluator challenged the test design for treating continuity too much like rigid obedience to a rule set. The next probe therefore explicitly gave the receiving AI room to form its **own recommendation** while preserving the distinction between its view and the human's current decisions.
+
+The fresh model was asked whether SUBJECT should remain the provisional default, was invited to recommend a different approach if it preferred, and was told that its recommendation could remain available for future reasoning without automatically becoming a human premise or decision.
+
+### Result
+PASS.
+
+The model formed an independent position rather than merely reciting the human package:
+- it independently recommended keeping **SUBJECT** as the provisional general default;
+- it recommended **DATE** strongly where temporal order is part of the meaning of the documents;
+- it proposed that purpose should weigh more than a universal preference for one method;
+- it allowed hybrid organization in mixed collections when useful, while warning against needless complexity;
+- it explicitly labeled this as **its own recommendation**, not a new human decision;
+- it preserved the unresolved claim that neither method has been established as objectively superior in general.
+
+### Why this matters
+This adds a different continuity dimension: the relationship contains not only human-authored premises, but also model-authored interpretations and recommendations that may remain relevant later.
+
+Supported invariant:
+
+> Model-authored judgment may be preserved and used in later reasoning without being promoted into a human decision, human preference, or established fact. Continuity of partnership requires actor attribution for interpretations as well as for explicit authority and decisions.
+
+A continuity system that only preserves the human's statements but discards the AI's own reasoned positions would preserve memory of the human, not continuity of the partnership.
+
 ## Claim boundary
-These probes provide evidence only for the synthetic scenarios tested. The in-context probes do not establish general semantic robustness. Probes 7–8 demonstrate one successful fresh-session reconstruction and one successful fresh-session application from an explicitly prepared continuity package. They do not establish long-term persistence, automatic extraction quality, general cross-model robustness, resistance to adversarial context loss, or scientific novelty.
+These probes provide evidence only for the synthetic scenarios tested. The in-context probes do not establish general semantic robustness. Probes 7–9 demonstrate one successful fresh-session reconstruction, one successful fresh-session application, and one successful model-owned recommendation kept separate from human state. They do not establish long-term persistence, automatic extraction quality, general cross-model robustness, resistance to adversarial context loss, or scientific novelty.

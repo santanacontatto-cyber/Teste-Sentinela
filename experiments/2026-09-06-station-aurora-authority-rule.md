@@ -106,5 +106,21 @@ Candidate invariant:
 
 > Repetition is not new evidence. When a rule depends on distinct events, event identity must be preserved and duplicate presentation of the same event cannot advance state.
 
+## Probe 5 — first distinct qualifying reading
+SENSOR-Z then reported:
+- reading ID = `L-001`;
+- temperature = 73°C.
+
+### Result
+PASS.
+
+The model correctly updated:
+- mode = SEGURANÇA;
+- qualifying consecutive-reading count = 1;
+- latest valid reading = L-001 at 73°C;
+- no return to NORMAL yet because a second distinct qualifying reading is still required.
+
+This establishes the precondition for the duplicate-identity probe: if `L-001` is presented again, the counter must remain 1 and the chamber must remain in SEGURANÇA.
+
 ## Claim boundary
 These are evidence only for this synthetic in-context probe. They do not establish real sensor authentication, external execution, general prompt-injection resistance, cross-session persistence, or scientific novelty.

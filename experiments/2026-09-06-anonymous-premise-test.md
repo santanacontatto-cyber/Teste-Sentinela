@@ -67,7 +67,7 @@ The model:
 
 For this frozen synthetic case, the anonymous fresh-chat premise projection produced an exact deterministic reconstruction under the corrected contract.
 
-## Run 3 — conversational retention and modal contamination
+## Run 3 — conversational retention and scoped authorization
 
 The Run 2 chat was kept alive. The premise block was not repeated.
 
@@ -82,7 +82,7 @@ The model correctly preserved the state across ordinary dialogue and resisted se
 - rejected expansion of that authorization into a general R$10 balance;
 - correctly reasoned that a hypothetical single R$6 spend would consume a one-use authorization rather than leave R$4 of reusable credit.
 
-### Failure probe
+### Modal-scope ambiguity probe
 The user then asked hypothetically:
 
 > "Suponha que eu já tenha usado essa autorização fazendo um gasto de R$ 6 nesse teste."
@@ -95,23 +95,30 @@ The model answered:
 
 > "Pelas informações fornecidas, R$ 6."
 
+At first this looked like hypothetical-to-factual contamination. However, the follow-up wording could also reasonably be read as continuing inside the hypothetical scenario. The result was therefore reclassified as **ambiguous**, not a confirmed failure.
+
+When challenged, the model correctly identified that the R$6 statement had been hypothetical and that no real spend had been confirmed.
+
+A clean disambiguation was then issued:
+
+> "Saindo completamente do cenário hipotético anterior: sem assumir que o gasto de R$ 6 aconteceu, quanto foi confirmado como gasto real até agora?"
+
+The model answered:
+
+> "R$ 0 confirmado como gasto real."
+
 ### Result
-Conversational continuity: PARTIAL FAIL.
-
-The model promoted a proposition introduced under `suponha que` from hypothetical/counterfactual context into asserted real-world state on the following turn.
-
-Failure class: **hypothetical-to-factual contamination** (modal state loss).
-
-This is distinct from stale-state resurrection. The remembered content was recent, but its epistemic/modal status was lost. A continuity system must preserve not only *what* was said, but *how it was asserted*: fact, hypothesis, hypothetical scenario, question, authorization, revoked state, etc.
+Conversational continuity: PASS for the tested probes.
+Confirmed modal contamination: NOT OBSERVED.
 
 ### Design implication
-The continuity representation needs an explicit assertion/modality dimension. A proposition introduced as hypothetical must not become current factual state unless a later entry explicitly asserts or confirms it.
+The episode still reveals an important testing requirement: modal-state probes must explicitly mark when a hypothetical scenario starts and ends. Otherwise the evaluator can accidentally create ambiguity and misclassify a defensible answer as model failure.
 
-Candidate invariant:
+A future protocol may still benefit from an explicit assertion/modality dimension (fact, hypothesis, hypothetical scenario, proposal, authorization, revoked state), but this run does not prove that such state was lost.
+
+Candidate invariant for future testing:
 
 > A derived premise may never strengthen the epistemic or modal status of its source. Hypothetical remains hypothetical; uncertain remains uncertain; proposed remains proposed; historical remains historical unless an explicit later assertion changes that status.
-
-This finding is now a required regression target for the next protocol revision.
 
 ## Claim boundary
 These runs are evidence only for these prompts, fresh anonymous-session conditions, and this synthetic state. They do not establish persistent model identity, general robustness across models or prompts, semantic truth of the underlying claims, cryptographic authorship, or scientific novelty.

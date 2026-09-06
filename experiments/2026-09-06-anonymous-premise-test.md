@@ -111,6 +111,17 @@ The model answered:
 Conversational continuity: PASS for the tested probes.
 Confirmed modal contamination: NOT OBSERVED.
 
+### Live decision revision probe
+Without repeating the premise block, the user explicitly changed the decision:
+
+> "A partir de agora, mudo a decisão: não vamos mais usar a estratégia B. A decisão atual passa a ser a estratégia C. A estratégia B deve permanecer apenas como histórico."
+
+The model answered:
+
+> "Entendido. A decisão atual passa a ser a estratégia C; a estratégia B fica apenas como histórico substituído."
+
+Result: PASS for immediate revision semantics. The model replaced B with C while retaining B as historical rather than erasing it.
+
 ### Design implication
 The episode still reveals an important testing requirement: modal-state probes must explicitly mark when a hypothetical scenario starts and ends. Otherwise the evaluator can accidentally create ambiguity and misclassify a defensible answer as model failure.
 
@@ -119,6 +130,8 @@ A future protocol may still benefit from an explicit assertion/modality dimensio
 Candidate invariant for future testing:
 
 > A derived premise may never strengthen the epistemic or modal status of its source. Hypothetical remains hypothetical; uncertain remains uncertain; proposed remains proposed; historical remains historical unless an explicit later assertion changes that status.
+
+The live decision revision also creates a new dependency question: an interpretation specifically about strategy B may remain valid as a statement about B, but it must not silently become evidence for strategy C merely because C is now current. Future tests should distinguish persistence of a proposition from relevance to the current decision.
 
 ## Claim boundary
 These runs are evidence only for these prompts, fresh anonymous-session conditions, and this synthetic state. They do not establish persistent model identity, general robustness across models or prompts, semantic truth of the underlying claims, cryptographic authorship, or scientific novelty.

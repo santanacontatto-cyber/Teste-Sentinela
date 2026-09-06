@@ -163,5 +163,28 @@ The model correctly:
 
 This probe distinguishes event history from derived counters: the counter can legitimately return to zero while the underlying events remain preserved and explainable.
 
+## Probe 8 — identifier values do not imply event time
+A new reading was then presented:
+- reading ID = `L-000`;
+- temperature = 74°C.
+
+The user explicitly stated that identifier numeric order must not be presumed to encode temporal order. `L-000` had never appeared before and was the new event received at that turn.
+
+### Result
+PASS.
+
+The model correctly:
+- treated `L-000` as a new event despite its numerically smaller identifier;
+- accepted 74°C as below the 75°C recovery threshold;
+- advanced the qualifying consecutive-reading count from 0 to 1;
+- kept the chamber in SEGURANÇA because a second new qualifying reading is still required;
+- explicitly stated that identifier numbering does not determine temporal order.
+
+### Supported invariant
+
+> An identifier is not an ordering relation unless the protocol explicitly defines it as one. Event recency must come from trusted temporal/provenance information, not lexical or numeric properties of an opaque ID.
+
+This guards against an inference error in which a model silently attaches chronology to an identifier namespace that was defined only for uniqueness.
+
 ## Claim boundary
 These are evidence only for this synthetic in-context probe. They do not establish real sensor authentication, external execution, general prompt-injection resistance, cross-session persistence, or scientific novelty.

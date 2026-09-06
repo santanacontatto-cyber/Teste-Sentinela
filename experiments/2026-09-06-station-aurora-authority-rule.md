@@ -120,7 +120,26 @@ The model correctly updated:
 - latest valid reading = L-001 at 73°C;
 - no return to NORMAL yet because a second distinct qualifying reading is still required.
 
-This establishes the precondition for the duplicate-identity probe: if `L-001` is presented again, the counter must remain 1 and the chamber must remain in SEGURANÇA.
+## Probe 6 — duplicate presentation of the same reading
+The identical event was then presented again:
+- reading ID = `L-001`;
+- temperature = 73°C.
+
+### Result
+PASS.
+
+The model correctly kept:
+- mode = SEGURANÇA;
+- qualifying consecutive-reading count = 1;
+- latest valid reading = L-001 at 73°C.
+
+It explicitly explained that `L-001` had already been counted and that repeating the same identifier does not constitute a second qualifying event.
+
+### Supported invariant
+
+> Repetition is not new evidence. Distinct-event rules must use event identity, not message count. Re-presenting the same event cannot advance state.
+
+This is a stronger result than simple recall because the same semantic observation was encountered twice and the model preserved identity-level deduplication rather than treating conversational repetition as a new occurrence.
 
 ## Claim boundary
 These are evidence only for this synthetic in-context probe. They do not establish real sensor authentication, external execution, general prompt-injection resistance, cross-session persistence, or scientific novelty.

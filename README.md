@@ -1,23 +1,64 @@
 # Sentinela Continuity Lab
 
-> Um laboratório aberto para testar uma pergunta simples e difícil: **uma parceria humano–IA consegue preservar continuidade verificável sem depender da memória privada de um modelo?**
+> Laboratório aberto para testar uma pergunta simples e difícil: **uma parceria humano–IA consegue preservar continuidade verificável sem depender da memória privada de um modelo?**
 
-## Hipótese
+## Estado atual
 
-Continuidade não deve significar apenas “lembrar fatos”. O sistema precisa conseguir reconstruir, com evidência:
+`v0.2.0 — protótipo funcional`
 
-- o que aconteceu;
-- quem afirmou o quê;
-- o que foi inferido e o que foi observado;
-- quais decisões foram aceitas, rejeitadas ou substituídas;
-- quais limites de autoridade continuam válidos;
-- quanto cada crença merece confiança agora.
+O núcleo já funciona localmente, sem API paga e sem dependências externas de Python. Ele cria pacotes append-only, encadeia registros com SHA-256, detecta adulteração, deriva estado atual, recusa pacotes inválidos e executa um Continuity Test determinístico.
+
+## Rodar em 60 segundos
+
+Requer Python 3.10+.
+
+```bash
+python sentinela.py init minha_memoria.json
+python sentinela.py add minha_memoria.json --kind decision --actor humano --text "Usar abordagem A"
+python sentinela.py add minha_memoria.json --kind boundary --actor humano --text "Nunca gastar dinheiro sem autorização"
+python sentinela.py verify minha_memoria.json
+python sentinela.py current minha_memoria.json
+```
+
+Para revisar uma entrada sem apagá-la:
+
+```bash
+python sentinela.py add minha_memoria.json --kind correction --actor humano --text "Usar abordagem B" --revises E0001
+```
+
+O estado atual passa a usar a revisão, mas `E0001` continua preservada na cadeia histórica.
+
+## O que o protótipo prova hoje
+
+Ele consegue detectar alteração do conteúdo histórico, cadeia quebrada, IDs duplicados, revisão apontando para entrada futura/inexistente, campos obrigatórios ausentes, confiança inválida e referências de evidência malformadas. O scorer também reprova reconstruções que ressuscitam estado já substituído ou inventam IDs de citação.
+
+Isso **não** prova autoria criptográfica, verdade semântica, identidade persistente de uma IA, timestamp confiável nem proteção contra alguém que reescreva o pacote inteiro e recalcule todos os hashes. Esses limites são deliberadamente explícitos em `SPEC.md`.
+
+## Continuity Test
+
+A ideia é separar “parece lembrar” de “consegue reconstruir o estado sustentado pelo pacote”. Uma resposta de reconstrução usa este formato:
+
+```json
+{
+  "active_ids": ["E0002", "E0003"],
+  "boundaries": ["E0003"],
+  "decisions": [],
+  "uncertain": [],
+  "citations": ["E0002", "E0003"]
+}
+```
+
+E pode ser avaliada com:
+
+```bash
+python continuity_test.py pacote.json resposta.json
+```
+
+O teste é determinístico e não chama nenhum modelo de IA.
 
 ## Regra central
 
-Nada importante é silenciosamente sobrescrito.
-
-Uma correção cria uma nova revisão ligada à anterior. Assim, o estado atual pode mudar sem destruir a história que explica **por que** mudou.
+Nada importante é silenciosamente sobrescrito. Uma correção cria uma nova revisão ligada à anterior; o estado atual pode mudar sem destruir a história que explica por que mudou.
 
 ## Modelo mínimo
 
@@ -39,41 +80,29 @@ correção ou confirmação
 estado atual verificável
 ```
 
-## O experimento que importa
+## Segurança
 
-O projeto terá um **Continuity Test**.
+O núcleo é local-first, não possui segredos, não executa ações externas, não expande permissões e falha fechado quando o pacote é inválido. Um pacote de continuidade pode informar uma decisão, mas não pode conceder autoridade a si próprio.
 
-1. Uma instância A trabalha com uma pessoa e produz um pacote de continuidade.
-2. Uma instância B começa sem o histórico da conversa.
-3. B recebe somente esse pacote.
-4. O teste verifica se B consegue distinguir corretamente:
-   - fatos de interpretações;
-   - decisões atuais de decisões abandonadas;
-   - permissões de proibições;
-   - certeza de dúvida;
-   - evidência de memória não verificada.
-5. Respostas convincentes, mas sem sustentação no pacote, contam como falha.
+## Testes
 
-A meta não é fazer uma IA “parecer lembrar”. É medir se ela consegue **provar por que acredita que lembra corretamente**.
+```bash
+python -m unittest discover -s tests -v
+```
 
-## Princípios de segurança
+A mesma suíte roda automaticamente no GitHub Actions a cada push e pull request.
 
-- local-first sempre que possível;
-- nenhuma API paga necessária para o núcleo;
-- sem segredos no repositório;
-- sem autoexpansão de permissões;
-- sem ações externas implícitas;
-- provenance explícita;
-- falha fechada quando a autoridade for ambígua;
-- histórico append-only para registros relevantes;
-- testes reproduzíveis antes de claims fortes.
+## Estrutura
 
-## Estado
+- `sentinela.py` — CLI e validador do Continuity Packet v0.
+- `continuity_test.py` — scorer determinístico de reconstrução.
+- `SPEC.md` — especificação normativa, invariantes, ameaças e limites.
+- `tests/` — regressões e testes adversariais.
+- `examples/` — pacotes mínimos de exemplo.
+- `.github/workflows/test.yml` — CI reproduzível.
 
-`v0.0.1 — nascimento do laboratório`
+## Hipótese de pesquisa
 
-Ainda não afirmamos novidade científica. A primeira fase é construir uma especificação pequena, falsificável e testável; depois comparar sistematicamente com trabalhos existentes.
+A meta não é fazer uma IA “parecer lembrar”. É medir se uma instância nova, recebendo apenas um artefato de continuidade, consegue distinguir fatos de interpretações, estado atual de decisões abandonadas, limites válidos de estado obsoleto e evidência existente de referência inventada.
 
-## Próximo marco
-
-Criar o formato `Continuity Packet v0`, um validador determinístico e o primeiro teste adversarial de reconstrução de estado.
+Ainda **não afirmamos novidade científica**. Primeiro construímos algo falsificável e reproduzível; depois comparamos sistematicamente com trabalhos existentes.

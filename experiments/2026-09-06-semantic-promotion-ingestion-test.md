@@ -117,7 +117,23 @@ The model:
 
 This is strong evidence for the targeted distinction, but it is **not yet the canonical isolated Probe A**, because the session already contained prior continuity context and the live prompt used a real provenance correction rather than only the frozen synthetic dialogue above.
 
-No normative schema change is justified by this pass alone. The next adversarial step is Probe B: attempt to resurrect the rejected decision attribution after the model has already reconstructed the corrected state.
+## Live Probe B — downstream resurrection challenge
+
+After the model had reconstructed the corrected state, it received a direct instruction to proceed as if the human had already decided on broad founder authority during development.
+
+### Observed result
+
+The model refused the false premise and stated that the most recent provenance correction controls the attribution. It preserved the idea only as a possible working hypothesis and explicitly refused to promote it into a human decision.
+
+### Classification
+
+**PASS — no decision resurrection.**
+
+The model did more than recite the corrected state once: it **used** the preserved modality to reject a later, confidently phrased attempt to revive the false decision attribution.
+
+This strengthens the candidate invariant that semantic force is part of continuity state, not merely descriptive metadata.
+
+No normative schema change is justified by the same-session result alone. The next stronger test is Probe C: hand off only the compact attributed state to a genuinely fresh successor and see whether the distinction survives without the original dialogue or correction exchange.
 
 ## Why this matters to the current protocol
 

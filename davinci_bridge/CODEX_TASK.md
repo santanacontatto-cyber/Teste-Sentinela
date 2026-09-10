@@ -1,42 +1,59 @@
-# CODEX TASK — instalar e provar a ponte Sentinela ↔ DaVinci
+# CODEX TASK — instalar e provar a ponte permanente Sentinela ↔ DaVinci
 
 Trabalhe somente nesta branch: `davinci-bridge-v0`.
 
-Objetivo: instalar e testar a ponte já desenhada. Não substitua a arquitetura antes do primeiro teste real.
+Objetivo: instalar e testar a arquitetura atual. O bridge é fixo; novas capacidades entram como módulos Lua em `davinci_bridge/modules/`.
 
 ## Restrições
 
 - Windows do usuário.
+- Custo zero.
 - Sem PowerShell.
 - Sem privilégios de administrador.
 - Não instalar software pago.
 - Não abrir portas de rede.
 - Não apagar arquivos anteriores do usuário.
 - Não alterar documentos existentes no Google Drive.
-- Não executar código recebido arbitrariamente pelo bridge.
-- Pode usar Python já disponível no seu ambiente e bibliotecas padrão.
+- Não usar shell através do bridge.
+- Não executar código textual arbitrário recebido pela mailbox.
+- Pode usar Python já disponível e bibliotecas padrão.
 
 ## Faça sozinho
 
-1. Inspecione o workspace e procure rastros da ponte antiga (Lua, DaVinci, Resolve, Fusion, bridge, sentinel/sentinela). Apenas relate se encontrar; não restaure por cima do v0.
-2. Confirme que `davinci_bridge/SentinelaBridge.lua`, `send_command.py` e `install_windows.py` estão presentes.
-3. Rode testes estáticos possíveis no Python (`py_compile`).
-4. Rode `python davinci_bridge/install_windows.py`.
-5. Confirme que o Lua foi copiado para a pasta Utility do usuário e que `%USERPROFILE%\SentinelaBridge\{inbox,outbox,logs}` existe.
-6. Descubra se DaVinci Resolve está instalado e informe versão/caminho se isso puder ser feito sem admin.
-7. Se for possível iniciar/testar o script no Resolve com as ferramentas autorizadas do seu ambiente, faça. Caso o único bloqueio seja um clique no menu do Resolve, pare nesse ponto e diga exatamente: `PRECISA DE 1 CLIQUE: Workspace > Scripts > SentinelaBridge`.
-8. Assim que o listener estiver ativo, rode:
+1. Confirme que existem:
+   - `davinci_bridge/SentinelaBridge.lua`
+   - `davinci_bridge/send_command.py`
+   - `davinci_bridge/install_windows.py`
+   - `davinci_bridge/modules/project_info.lua`
+   - `davinci_bridge/modules/open_page.lua`
+   - `davinci_bridge/modules/save_project.lua`
+2. Rode:
+   - `python -m py_compile davinci_bridge/send_command.py davinci_bridge/install_windows.py davinci_bridge/test_protocol.py`
+   - `python -m unittest -v davinci_bridge/test_protocol.py` ou equivalente a partir da pasta correta.
+3. Rode `python davinci_bridge/install_windows.py`.
+4. Confirme:
+   - listener copiado para a pasta `Utility` do Resolve;
+   - `%USERPROFILE%\SentinelaBridge\{inbox,outbox,logs,modules}` criado;
+   - os três módulos Lua copiados para `modules`.
+5. Descubra se o DaVinci Resolve está instalado e informe caminho/versão sem exigir admin.
+6. Se puder iniciar o script no Resolve com seu acesso atual, faça. Se houver um único bloqueio de GUI, pare e diga exatamente:
+   `PRECISA DE 1 CLIQUE: Workspace > Scripts > SentinelaBridge`
+7. Com o listener ativo, execute nesta ordem:
    - `python davinci_bridge/send_command.py ping`
-   - `python davinci_bridge/send_command.py project_info`
-   - `python davinci_bridge/send_command.py open_page --page edit`
-9. Não rode `save_project` automaticamente no primeiro teste.
-10. Encerre com `python davinci_bridge/send_command.py stop_bridge`.
-11. Grave um relatório novo em `davinci_bridge/CODEX_RESULT.md` nesta branch com:
+   - `python davinci_bridge/send_command.py run project_info`
+   - `python davinci_bridge/send_command.py run open_page --arg page=edit`
+8. Não execute `save_project` no primeiro teste.
+9. Prova de hot-load, se o listener estiver funcionando:
+   - copie/sincronize novamente `project_info.lua` sem reiniciar o listener;
+   - rode `run project_info` outra vez;
+   - registre que o módulo foi carregado de arquivo separado do bridge.
+10. Encerre com `python davinci_bridge/send_command.py stop`.
+11. Grave `davinci_bridge/CODEX_RESULT.md` nesta branch com:
    - ambiente encontrado;
-   - rastros da ponte antiga;
-   - arquivos instalados;
-   - saída literal dos testes;
+   - caminhos instalados;
+   - saída literal de cada teste;
    - falhas/erros;
+   - confirmação ou não de hot-load;
    - próximo menor passo.
 
-Não peça ao usuário para fazer investigação técnica. Só peça intervenção quando for impossível atravessar uma etapa do GUI com seu acesso atual.
+Não peça ao usuário para investigar tecnicamente. Só peça intervenção quando seu acesso ao GUI realmente não conseguir atravessar uma etapa.

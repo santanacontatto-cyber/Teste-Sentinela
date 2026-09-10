@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Send commands to SentinelaBridge through a local file mailbox.
+"""Cliente local da ponte Sentinela ↔ DaVinci.
 
-Standard-library only. This process does not connect to the Resolve API; the Lua
-script running inside Resolve reads request.txt and writes response.txt.
+Biblioteca padrão apenas. O processo externo escreve uma requisição na mailbox;
+o Lua dentro do Resolve lê, executa um módulo Lua local e devolve a resposta.
 """
 
 from __future__ import annotations
@@ -10,9 +10,13 @@ from __future__ import annotations
 import argparse
 import os
 import pathlib
+import re
 import tempfile
 import time
 import uuid
+
+_SAFE_NAME = re.compile(r"^[A-Za-z0-9_-]+$")
+_SAFE_KEY = re.compile(r"^[A-Za-z0-9_.-]+$")
 
 
 def bridge_home() -> pathlib.Path:
@@ -48,16 +52,31 @@ def parse_response(text: str) -> dict[str, str]:
     return result
 
 
-def send(command: str, *, page: str | None = None, timeout: float = 20.0) -> dict[str, str]:
+def _clean_value(value: str) -> str:
+    if "\n" in value or "\r" in value:
+        raise ValueError("argument values cannot contain newlines")
+    return value
+
+
+def _parse_arg(item: str) -> tuple[str, str]:
+    if "=" not in item:
+        raise argparse.ArgumentTypeError("--arg must be KEY=VALUE")
+    key, value = item.split("=", 1)
+    if not _SAFE_KEY.fullmatch(key):
+        raise argparse.ArgumentTypeError(f"invalid argument key: {key!r}")
+    try:
+        value = _clean_value(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError(str(exc)) from exc
+    return key, value
+
+
+def _round_trip(fields: list[str], *, timeout: float) -> dict[str, str]:
     root = bridge_home()
     request = root / "inbox" / "request.txt"
     response = root / "outbox" / "response.txt"
     request_id = f"{int(time.time() * 1000)}-{uuid.uuid4().hex[:8]}"
-
-    fields = [f"id={request_id}", f"command={command.upper()}"]
-    if page:
-        fields.append(f"page={page.lower()}")
-    atomic_write(request, "\n".join(fields) + "\n")
+    atomic_write(request, "\n".join([f"id={request_id}", *fields]) + "\n")
 
     deadline = time.monotonic() + timeout
     while time.monotonic() < deadline:
@@ -75,20 +94,52 @@ def send(command: str, *, page: str | None = None, timeout: float = 20.0) -> dic
     )
 
 
+def ping(*, timeout: float = 20.0) -> dict[str, str]:
+    return _round_trip(["command=PING"], timeout=timeout)
+
+
+def stop_bridge(*, timeout: float = 20.0) -> dict[str, str]:
+    return _round_trip(["command=STOP_BRIDGE"], timeout=timeout)
+
+
+def run_module(
+    module: str,
+    *,
+    arguments: dict[str, str] | None = None,
+    timeout: float = 20.0,
+) -> dict[str, str]:
+    if not _SAFE_NAME.fullmatch(module):
+        raise ValueError(f"invalid module name: {module!r}")
+
+    fields = ["command=RUN", f"module={module}"]
+    for key, value in sorted((arguments or {}).items()):
+        if not _SAFE_KEY.fullmatch(key):
+            raise ValueError(f"invalid argument key: {key!r}")
+        fields.append(f"arg.{key}={_clean_value(value)}")
+    return _round_trip(fields, timeout=timeout)
+
+
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Send a command to SentinelaBridge")
-    parser.add_argument(
-        "command",
-        choices=["ping", "project_info", "open_page", "save_project", "stop_bridge"],
-    )
-    parser.add_argument("--page", choices=["media", "cut", "edit", "fusion", "color", "fairlight", "deliver"])
+    parser = argparse.ArgumentParser(description="Sentinela ↔ DaVinci bridge client")
     parser.add_argument("--timeout", type=float, default=20.0)
+    sub = parser.add_subparsers(dest="action", required=True)
+
+    sub.add_parser("ping", help="test the permanent bridge")
+    sub.add_parser("stop", help="stop the bridge listener")
+
+    run = sub.add_parser("run", help="run a Lua module already deployed to the bridge")
+    run.add_argument("module")
+    run.add_argument("--arg", action="append", default=[], type=_parse_arg, metavar="KEY=VALUE")
+
     args = parser.parse_args()
+    if args.action == "ping":
+        result = ping(timeout=args.timeout)
+    elif args.action == "stop":
+        result = stop_bridge(timeout=args.timeout)
+    else:
+        values = dict(args.arg)
+        result = run_module(args.module, arguments=values, timeout=args.timeout)
 
-    if args.command == "open_page" and not args.page:
-        parser.error("open_page requires --page")
-
-    result = send(args.command, page=args.page, timeout=args.timeout)
     for key in sorted(result):
         print(f"{key}={result[key]}")
     return 0 if result.get("status") == "ok" else 1

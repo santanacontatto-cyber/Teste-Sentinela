@@ -1,122 +1,131 @@
-# Sentinela ↔ DaVinci Bridge v0
+# Sentinela ↔ DaVinci Bridge v1
 
-Primeira reconstrução da ponte, feita para Windows e para depender do mínimo possível.
+Ponte permanente para Windows entre Sentinela/Codex e Lua rodando **dentro** do DaVinci Resolve.
 
-## Objetivo
+## Arquitetura
 
-Permitir que um agente local (Codex ou outro processo autorizado) troque comandos com um script Lua rodando **dentro** do DaVinci Resolve.
+```text
+Sentinela / Codex
+      ↓
+request.txt / response.txt
+      ↓
+SentinelaBridge.lua  ← ponte fixa
+      ↓
+modules/*.lua        ← capacidades que podem mudar sem reconstruir a ponte
+      ↓
+DaVinci Resolve API
+```
 
-Fluxo:
+A regra central do v1 é simples: **a ponte não cresce junto com cada automação**. Ela só recebe uma requisição, carrega um módulo Lua local por nome e devolve o resultado. Novas capacidades entram como novos módulos Lua.
 
-`Sentinela/Codex -> request.txt -> Lua dentro do Resolve -> Resolve API -> response.txt -> Sentinela/Codex`
+Isso permite que montagem, Fusion, áudio, render, inspeção de projeto e verificações sejam desenvolvidos depois sem trocar o transporte.
 
-O v0 não abre porta de rede, não executa shell, não usa PowerShell, não pede admin e não baixa biblioteca de terceiros.
+## Restrições mantidas
 
-## Por que a ponte usa mailbox de arquivos
+- custo zero;
+- sem PowerShell;
+- sem admin;
+- sem portas de rede;
+- sem pacotes Python de terceiros;
+- sem shell pelo bridge;
+- sem `eval` de código textual;
+- sem caminho arbitrário de módulo;
+- módulos aceitos apenas por nome simples (`A-Z`, `a-z`, `0-9`, `_`, `-`).
 
-A API de scripting externa/remota é uma limitação importante entre edições do Resolve. Rodando o Lua pelo menu Scripts do próprio Resolve, o bridge não precisa que o processo externo carregue a API do Resolve. O processo externo só escreve e lê arquivos de texto.
+## Hot-load de módulos
 
-Isso também deixa o canal simples de auditar: cada comando e cada resposta ficam visíveis em disco.
+O bridge usa `loadfile()` em **cada** requisição `RUN`. Portanto, quando um arquivo em `%USERPROFILE%\SentinelaBridge\modules\` é atualizado, a próxima chamada já usa a nova versão. Não é necessário reconstruir nem reiniciar a ponte para cada função nova.
+
+O módulo deve retornar uma função Lua:
+
+```lua
+return function(ctx, req)
+    -- ctx.resolve = API do Resolve
+    -- ctx.snapshot(resolve) = snapshot básico
+    -- req["arg.nome"] = argumentos enviados
+    return { status="ok", resultado="..." }
+end
+```
+
+Também é aceito `return { run = function(ctx, req) ... end }`.
 
 ## Arquivos
 
-- `SentinelaBridge.lua` — listener que roda dentro do Resolve.
-- `send_command.py` — cliente local, somente biblioteca padrão do Python.
-- `install_windows.py` — instalação por usuário, sem admin.
-- `CODEX_TASK.md` — instrução para o Codex instalar/testar sem inventar outra arquitetura.
+- `SentinelaBridge.lua` — listener/dispatcher fixo dentro do Resolve.
+- `send_command.py` — cliente local genérico.
+- `install_windows.py` — instala o listener e sincroniza módulos, sem admin.
+- `modules/` — capacidades Lua substituíveis.
+- `CODEX_TASK.md` — roteiro para o Codex instalar e provar tudo no PC real.
 
-## Instalação Windows
+## Instalação
 
-No checkout desta branch:
+No checkout da branch:
 
 ```text
 python davinci_bridge/install_windows.py
 ```
 
-O instalador copia o Lua para:
+O listener vai para:
 
 ```text
 %APPDATA%\Blackmagic Design\DaVinci Resolve\Support\Fusion\Scripts\Utility\SentinelaBridge.lua
 ```
 
-E cria a mailbox:
+A mailbox e os módulos ficam em:
 
 ```text
 %USERPROFILE%\SentinelaBridge\
-  inbox\request.txt
-  outbox\response.txt
-  logs\bridge.log
-  last_id.txt
+  inbox\
+  outbox\
+  logs\
+  modules\
 ```
 
-Se `SENTINELA_BRIDGE_HOME` existir no ambiente do Resolve, esse caminho substitui o padrão. Isso permite depois apontar a mailbox para uma pasta sincronizada, inclusive uma pasta do Drive, sem alterar o protocolo.
+## Primeiro teste real
 
-## Primeiro teste
-
-1. Reinicie o Resolve se ele já estava aberto.
-2. No Resolve, execute `Workspace > Scripts > SentinelaBridge`.
-3. Em outro processo local:
+1. Reiniciar o Resolve se necessário.
+2. Executar uma vez `Workspace > Scripts > SentinelaBridge`.
+3. Testar a ponte:
 
 ```text
 python davinci_bridge/send_command.py ping
 ```
 
-Resposta esperada contém pelo menos:
+4. Testar módulo Lua:
 
 ```text
-status=ok
-command=PING
-product=...
-version=...
-project=...
-timeline=...
+python davinci_bridge/send_command.py run project_info
 ```
 
-## Comandos v0
-
-### PING
-
-Somente leitura. Retorna produto, versão, página, projeto e timeline atuais.
-
-### PROJECT_INFO
-
-Somente leitura. Mesmo snapshot de estado do PING.
-
-### OPEN_PAGE
-
-Abre uma página permitida: `media`, `cut`, `edit`, `fusion`, `color`, `fairlight`, `deliver`.
-
-Exemplo:
+5. Testar parâmetro para módulo:
 
 ```text
-python davinci_bridge/send_command.py open_page --page edit
+python davinci_bridge/send_command.py run open_page --arg page=edit
 ```
 
-### SAVE_PROJECT
-
-Solicita `ProjectManager.SaveProject()` no projeto atual.
-
-### STOP_BRIDGE
-
-Encerra o listener sem matar o Resolve.
+6. Encerrar listener:
 
 ```text
-python davinci_bridge/send_command.py stop_bridge
+python davinci_bridge/send_command.py stop
 ```
 
-## Limites deliberados do v0
+## Módulos iniciais
 
-Não existe comando `EVAL`, `EXEC`, shell ou caminho arbitrário. O protocolo é uma allowlist pequena porque primeiro precisamos provar a conexão real. Depois do PING confirmado, expandimos diretamente para operações de edição que tenham valor no nosso fluxo.
+- `project_info.lua` — leitura do projeto/timeline atual.
+- `open_page.lua` — muda entre páginas válidas do Resolve.
+- `save_project.lua` — salva o projeto apenas quando chamado explicitamente.
+
+Esses módulos existem só para provar que o transporte é genérico. Eles **não definem o limite da ponte**.
 
 ## Critério de sucesso
 
-O bridge v0 está provado quando:
+A ponte está provada quando:
 
-1. Codex consegue instalar os arquivos localmente;
-2. `SentinelaBridge` inicia dentro do Resolve;
-3. `PING` volta com o projeto real aberto;
-4. `OPEN_PAGE edit` muda a página;
-5. `STOP_BRIDGE` encerra limpo;
-6. o log registra a sequência.
+1. Codex instala sem admin;
+2. Resolve inicia `SentinelaBridge`;
+3. `ping` retorna dados do Resolve real;
+4. `run project_info` executa um arquivo Lua separado do listener;
+5. uma alteração de módulo pode ser sincronizada e usada sem reconstruir o listener;
+6. tudo fica registrado no log local.
 
-A partir daí, a ponte existe de verdade e não precisamos reconstruir a camada de transporte novamente.
+Depois disso, a ponte deixa de ser parte do problema: as novas capacidades passam a ser trabalho de módulos Lua.

@@ -33,3 +33,4 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y -qq lua5.1
           luac5.1 -p davinci_bridge/SentinelaBridge.lua
+          for f in davinci_bridge/modules/*.lua; do luac5.1 -p "$f"; done

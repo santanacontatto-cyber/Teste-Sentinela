@@ -1,10 +1,5 @@
 #!/usr/bin/env python3
-"""Offline tests for the Sentinela ↔ DaVinci file-mailbox transport.
-
-These tests do not require DaVinci Resolve. They prove that the Python side writes
-a request, ignores stale responses, matches request IDs, and receives a response
-through the exact mailbox paths used by the Lua bridge.
-"""
+"""Offline tests for the permanent Sentinela ↔ DaVinci mailbox transport."""
 
 from __future__ import annotations
 
@@ -26,19 +21,18 @@ class BridgeProtocolTests(unittest.TestCase):
         self.assertEqual(parsed["project"], "Sentinela")
         self.assertEqual(parsed["empty"], "")
 
-    def test_round_trip_ignores_stale_response(self) -> None:
+    def _with_fake_listener(self, responder, invoke):
         with tempfile.TemporaryDirectory() as tmp:
             root = pathlib.Path(tmp)
             inbox = root / "inbox"
             outbox = root / "outbox"
             inbox.mkdir(parents=True)
             outbox.mkdir(parents=True)
-
-            # A stale response must never satisfy a fresh command.
             (outbox / "response.txt").write_text(
-                "id=old-request\nstatus=ok\nproject=wrong\n",
-                encoding="utf-8",
+                "id=stale\nstatus=ok\nproject=wrong\n", encoding="utf-8"
             )
+
+            seen = {}
 
             def fake_lua_listener() -> None:
                 request_path = inbox / "request.txt"
@@ -48,37 +42,55 @@ class BridgeProtocolTests(unittest.TestCase):
                         request = send_command.parse_response(
                             request_path.read_text(encoding="utf-8")
                         )
-                        request_id = request.get("id")
-                        if request_id:
-                            send_command.atomic_write(
-                                outbox / "response.txt",
-                                "\n".join(
-                                    [
-                                        f"id={request_id}",
-                                        "status=ok",
-                                        "command=PING",
-                                        "product=DaVinci Resolve",
-                                        "project=Sentinela_Test",
-                                    ]
-                                )
-                                + "\n",
-                            )
+                        if request.get("id"):
+                            seen.update(request)
+                            payload = responder(request)
+                            payload["id"] = request["id"]
+                            text = "\n".join(f"{k}={v}" for k, v in payload.items()) + "\n"
+                            send_command.atomic_write(outbox / "response.txt", text)
                             return
                     time.sleep(0.01)
                 raise AssertionError("fake listener did not receive request")
 
             listener = threading.Thread(target=fake_lua_listener, daemon=True)
             listener.start()
-
             with mock.patch.dict(os.environ, {"SENTINELA_BRIDGE_HOME": str(root)}):
-                result = send_command.send("ping", timeout=2.0)
-
+                result = invoke()
             listener.join(timeout=1.0)
             self.assertFalse(listener.is_alive())
-            self.assertEqual(result["status"], "ok")
-            self.assertEqual(result["command"], "PING")
-            self.assertEqual(result["project"], "Sentinela_Test")
-            self.assertNotEqual(result["id"], "old-request")
+            self.assertNotEqual(result["id"], "stale")
+            return seen, result
+
+    def test_ping_round_trip_ignores_stale_response(self) -> None:
+        seen, result = self._with_fake_listener(
+            lambda req: {"status": "ok", "command": req["command"], "bridge": "SentinelaBridge-v1"},
+            lambda: send_command.ping(timeout=2.0),
+        )
+        self.assertEqual(seen["command"], "PING")
+        self.assertEqual(result["status"], "ok")
+        self.assertEqual(result["bridge"], "SentinelaBridge-v1")
+
+    def test_generic_module_round_trip(self) -> None:
+        seen, result = self._with_fake_listener(
+            lambda req: {
+                "status": "ok",
+                "command": req["command"],
+                "module": req["module"],
+                "echo.page": req.get("arg.page", ""),
+            },
+            lambda: send_command.run_module(
+                "open_page", arguments={"page": "edit"}, timeout=2.0
+            ),
+        )
+        self.assertEqual(seen["command"], "RUN")
+        self.assertEqual(seen["module"], "open_page")
+        self.assertEqual(seen["arg.page"], "edit")
+        self.assertEqual(result["module"], "open_page")
+        self.assertEqual(result["echo.page"], "edit")
+
+    def test_rejects_module_path_traversal(self) -> None:
+        with self.assertRaises(ValueError):
+            send_command.run_module("../evil", timeout=0.01)
 
 
 if __name__ == "__main__":

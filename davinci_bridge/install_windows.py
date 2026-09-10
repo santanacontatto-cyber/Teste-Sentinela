@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Install SentinelaBridge for the current Windows user.
+"""Instala a ponte Sentinela ↔ DaVinci para o usuário atual do Windows.
 
-No admin rights, PowerShell, registry edits, services, sockets, or third-party
-packages. It copies the Lua script into Resolve's per-user Utility scripts
-folder and creates the local mailbox directories.
+Sem admin, PowerShell, registro, serviços, sockets ou pacotes de terceiros.
+Copia o listener Lua para o menu Scripts do Resolve e sincroniza módulos Lua
+para a pasta local da ponte.
 """
 
 from __future__ import annotations
@@ -20,9 +20,13 @@ def main() -> int:
         return 2
 
     here = pathlib.Path(__file__).resolve().parent
-    source = here / "SentinelaBridge.lua"
-    if not source.exists():
-        print(f"Missing source script: {source}", file=sys.stderr)
+    bridge_source = here / "SentinelaBridge.lua"
+    modules_source = here / "modules"
+    if not bridge_source.exists():
+        print(f"Missing bridge script: {bridge_source}", file=sys.stderr)
+        return 2
+    if not modules_source.is_dir():
+        print(f"Missing modules directory: {modules_source}", file=sys.stderr)
         return 2
 
     appdata = os.environ.get("APPDATA")
@@ -30,7 +34,7 @@ def main() -> int:
         print("APPDATA is not available.", file=sys.stderr)
         return 2
 
-    target_dir = (
+    resolve_scripts = (
         pathlib.Path(appdata)
         / "Blackmagic Design"
         / "DaVinci Resolve"
@@ -39,19 +43,30 @@ def main() -> int:
         / "Scripts"
         / "Utility"
     )
-    target_dir.mkdir(parents=True, exist_ok=True)
-    target = target_dir / "SentinelaBridge.lua"
-    shutil.copy2(source, target)
+    resolve_scripts.mkdir(parents=True, exist_ok=True)
+    bridge_target = resolve_scripts / "SentinelaBridge.lua"
+    shutil.copy2(bridge_source, bridge_target)
 
-    root = pathlib.Path(os.environ.get("SENTINELA_BRIDGE_HOME", pathlib.Path.home() / "SentinelaBridge"))
-    for name in ("inbox", "outbox", "logs"):
+    root = pathlib.Path(
+        os.environ.get("SENTINELA_BRIDGE_HOME", str(pathlib.Path.home() / "SentinelaBridge"))
+    )
+    for name in ("inbox", "outbox", "logs", "modules"):
         (root / name).mkdir(parents=True, exist_ok=True)
 
-    print("SentinelaBridge installed.")
-    print(f"Lua script: {target}")
+    copied_modules: list[str] = []
+    for source in sorted(modules_source.glob("*.lua")):
+        target = root / "modules" / source.name
+        shutil.copy2(source, target)
+        copied_modules.append(source.name)
+
+    print("SentinelaBridge installed/synced.")
+    print(f"Bridge Lua: {bridge_target}")
     print(f"Mailbox:    {root}")
-    print("Next: restart Resolve if it was open, then run Workspace > Scripts > SentinelaBridge once.")
-    print("Test: python send_command.py ping")
+    print(f"Modules:    {root / 'modules'}")
+    for name in copied_modules:
+        print(f"  + {name}")
+    print("Next: restart Resolve if needed, then run Workspace > Scripts > SentinelaBridge once.")
+    print("Test: python davinci_bridge/send_command.py ping")
     return 0
 
 

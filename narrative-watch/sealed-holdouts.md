@@ -44,6 +44,20 @@ When H2 is revealed, the exact canonical plaintext will be published verbatim. A
 
 When H3 is revealed, its exact canonical plaintext, including its salt, will be published verbatim. Anyone can compute SHA-256 over its UTF-8 bytes (LF line endings) and verify the commitment above.
 
+## H4 — committed 2026-09-13
+
+- Algorithm: SHA-256
+- Canonical encoding: UTF-8, LF line endings
+- Commitment: `28bb1306458df877efbaa25575c662fa1855ad3dac5b9d59c11be3efd2fcbd99`
+- Scope: governments, regulators, philanthropic networks, policy organizations, researchers and journalism.
+- Private source: a new unshared Drive record created after the cross-institution audit and stored in the sealed-holdout folder.
+- Reveal condition: after all H4 items resolve, on 2026-12-31, or earlier if credible evidence shows the sealed content itself was exposed.
+- H4 contains both predictions favorable to the broader frame-migration hypothesis and explicit independence/counterexample tests capable of weakening it.
+
+### Verification after reveal
+
+When H4 is revealed, its exact canonical plaintext will be published verbatim. Anyone can compute SHA-256 over its UTF-8 bytes (LF line endings) and verify the commitment above.
+
 ### Anti-gaming rule
 
 If an actor under observation cites, links to, or demonstrably responds to Narrative Watch before a prediction resolves, affected predictions are marked `CONTAMINATED`. They do **not** count as clean confirmation, even if the subsequent behavior matches the prediction.

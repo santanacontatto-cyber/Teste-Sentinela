@@ -58,6 +58,20 @@ When H3 is revealed, its exact canonical plaintext, including its salt, will be 
 
 When H4 is revealed, its exact canonical plaintext will be published verbatim. Anyone can compute SHA-256 over its UTF-8 bytes (LF line endings) and verify the commitment above.
 
+## H5 — committed 2026-09-13
+
+- Algorithm: SHA-256
+- Canonical encoding: UTF-8, LF line endings
+- Commitment: `c7198d067fe32a190e6aa2bdf9f8958355cd15dd6060ce97cb5706dc80c0cb95`
+- Scope: **costly divergence** — whether safety, transparency, independence and public-interest principles survive when they impose material self-cost on labs, regulators, funders, policy organizations or journalism.
+- Private source: a new unshared Drive record created after the costly-divergence baseline and stored in the sealed-holdout folder.
+- Reveal condition: after 2026-12-31, or earlier if at least three H5 predictions become decisively resolvable without contaminating the remaining tests.
+- H5 contains both convenience-pattern predictions and explicit counterexamples that weaken the broader hypothesis if actors repeatedly accept material self-cost to preserve prior constraints.
+
+### Verification after reveal
+
+When H5 is revealed, its exact canonical plaintext, including its salt, will be published verbatim. Anyone can compute SHA-256 over its UTF-8 bytes (LF line endings) and verify the commitment above.
+
 ### Anti-gaming rule
 
 If an actor under observation cites, links to, or demonstrably responds to Narrative Watch before a prediction resolves, affected predictions are marked `CONTAMINATED`. They do **not** count as clean confirmation, even if the subsequent behavior matches the prediction.

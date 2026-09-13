@@ -81,6 +81,23 @@ This is an important asymmetry between "open" rhetoric and actual legal permissi
 
 Status: **control / asymmetry; not counted as a relaxation event.**
 
+## 5. Microsoft — organizational substitution, weaker evidence
+
+Microsoft's 2022 Responsible AI Standard described concrete goals and requirements intended to govern AI product development, and Microsoft still maintains company-wide responsible-AI governance.
+
+Primary source:
+- https://blogs.microsoft.com/on-the-issues/2022/06/21/microsofts-framework-for-building-ai-systems-responsibly/
+
+In 2023 Microsoft wound down the remaining Ethics & Society team while accelerating deployment of OpenAI technology. Microsoft later told shareholders that it had moved some former specialists into product teams, invested in other responsible-AI structures, and believed the new organizational design would spread responsible-AI practice more effectively.
+
+Sources:
+- https://www.sec.gov/Archives/edgar/data/789019/000119312523259247/d356108ddef14a1.pdf
+- https://techcrunch.com/2023/03/13/microsoft-lays-off-an-ethical-ai-team-as-it-doubles-down-on-openai/
+
+Interpretation: this is not a clean case of a public safety rule being loosened. It is a **governance-structure substitution** that occurred during a rapid commercialization push. Because Microsoft retained other responsible-AI institutions, it is weaker evidence than Anthropic or Google and should not be promoted to the same category without more direct before/after requirements.
+
+Status: **tentative organizational substitution; not a strong hit.**
+
 ## Cross-lab result so far
 
 The same broad structural phenomenon appears in more than one organization, but in different forms:
@@ -91,12 +108,13 @@ The same broad structural phenomenon appears in more than one organization, but 
 | Anthropic | hard conditional safety commitments / pause logic | nonbinding roadmap goals + risk reports + external review | feasibility, ambiguity, political environment, unilateral cost | strong constraint substitution |
 | Google | explicit no-go application categories | broad benefit-risk principles + oversight | geopolitical competition / national security | strong constraint replacement |
 | Meta | "open" access ideal | open weights with retained license restrictions and own risk framework | competition / national security | control case, not migration hit |
+| Microsoft | dedicated ethics/society function plus company-wide RAI standard | distributed governance + central RAI structures after team wind-down | rapid product commercialization | tentative organizational substitution |
 
 ## Provisional hypothesis
 
 **Constraint Migration Hypothesis:** when an AI organization encounters a materially costly conflict between a previously stated hard constraint and later operational pressures, it may preserve the high-level value while replacing the hard constraint with a mechanism that leaves more room for case-by-case discretion.
 
-This is not equivalent to "they always weaken safety." In the two strongest non-OpenAI cases, the organization also introduced or maintained other safety mechanisms. The predicted pattern is **substitution and migration of constraints**, not simple disappearance.
+This is not equivalent to "they always weaken safety." In the strongest non-OpenAI cases, the organization also introduced or maintained other safety mechanisms. The predicted pattern is **substitution and migration of constraints**, not simple disappearance.
 
 ## What would weaken this hypothesis
 
@@ -106,7 +124,7 @@ Another counterexample would be a pattern where updated constraints systematical
 
 ## Anti-selection rule
 
-Meta is deliberately included as a non-hit. Future audits must preserve organizations and episodes that do not fit the pattern. We will not count unchanged rhetoric, ordinary policy maintenance, or a new policy written after the fact as evidence that an earlier constraint migrated.
+Meta is deliberately included as a non-hit and Microsoft as a weak/tentative case. Future audits must preserve organizations and episodes that do not fit the pattern. We will not count unchanged rhetoric, ordinary policy maintenance, or a new policy written after the fact as evidence that an earlier constraint migrated.
 
 ## Next test
 

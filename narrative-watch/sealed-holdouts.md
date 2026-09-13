@@ -30,6 +30,20 @@ When H1 is revealed, the exact canonical plaintext and its salt will be publishe
 
 When H2 is revealed, the exact canonical plaintext will be published verbatim. Anyone can compute SHA-256 over its UTF-8 bytes (LF line endings) and verify the commitment above.
 
+## H3 — committed 2026-09-13
+
+- Algorithm: SHA-256
+- Canonical encoding: UTF-8, LF line endings
+- Commitment: `72c5c8b87c2cf58f3d051c87933753645df95a22975950bf93c963a1311fdaa7`
+- Scope: cross-lab **constraint migration** across OpenAI, Anthropic, Google DeepMind, Meta, xAI and Microsoft AI.
+- Private source: a new unshared Drive record created after the cross-lab historical audit and stored in the sealed-holdout folder.
+- Reveal condition: after 2026-12-31, or earlier if a qualifying cross-lab event resolves without contaminating remaining H3 predictions.
+- H3 contains both positive predictions and a deliberately costly counterexample. Meta's pre-existing open-access licensing asymmetry is explicitly baseline and cannot be counted as a future hit.
+
+### Verification after reveal
+
+When H3 is revealed, its exact canonical plaintext, including its salt, will be published verbatim. Anyone can compute SHA-256 over its UTF-8 bytes (LF line endings) and verify the commitment above.
+
 ### Anti-gaming rule
 
 If an actor under observation cites, links to, or demonstrably responds to Narrative Watch before a prediction resolves, affected predictions are marked `CONTAMINATED`. They do **not** count as clean confirmation, even if the subsequent behavior matches the prediction.

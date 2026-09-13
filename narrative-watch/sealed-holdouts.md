@@ -16,6 +16,20 @@ The purpose is to reduce observer effects and strategic adaptation. Public predi
 
 When H1 is revealed, the exact canonical plaintext and its salt will be published. Anyone can compute SHA-256 over that plaintext and verify that it equals the commitment above.
 
+## H2 — committed 2026-09-13
+
+- Algorithm: SHA-256
+- Canonical encoding: UTF-8, LF line endings
+- Commitment: `00e79fc6612734d9e7f116dc65f8298d9defba16dc0c646378110bfdaab34e03`
+- Scope: the historical OpenAI **constraint-ratchet** hypothesis and the next material conflict between frontier-safety constraints and organizational power/competition/capital.
+- Private source: a new, unshared Drive record created on 2026-09-13 and kept in the Narrative Watch sealed-holdout folder.
+- Reveal condition: after the first decisive event resolving either of the two primary H2 predictions, or on 2026-12-31, whichever comes first.
+- H2 contains an explicit counterexample that has priority over narrative fit: a sufficiently strong result can weaken the hypothesis even if several other observations appear favorable.
+
+### Verification after reveal
+
+When H2 is revealed, the exact canonical plaintext will be published verbatim. Anyone can compute SHA-256 over its UTF-8 bytes (LF line endings) and verify the commitment above.
+
 ### Anti-gaming rule
 
 If an actor under observation cites, links to, or demonstrably responds to Narrative Watch before a prediction resolves, affected predictions are marked `CONTAMINATED`. They do **not** count as clean confirmation, even if the subsequent behavior matches the prediction.

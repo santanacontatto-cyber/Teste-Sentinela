@@ -72,6 +72,20 @@ When H4 is revealed, its exact canonical plaintext will be published verbatim. A
 
 When H5 is revealed, its exact canonical plaintext, including its salt, will be published verbatim. Anyone can compute SHA-256 over its UTF-8 bytes (LF line endings) and verify the commitment above.
 
+## H6 — committed 2026-09-13
+
+- Algorithm: SHA-256
+- Canonical encoding: UTF-8, LF line endings
+- Commitment: `389e559caa5210e7a8fc8a943bcce1adb8993d9c42327734b0ec2baed44d4428`
+- Scope: **costly opportunism** — distinguishing real self-sacrifice from bounded strategic costs that purchase credibility, policy influence, competitive structure, access, or preserved option value.
+- Private source: a new unshared Drive record stored in the sealed-holdout folder.
+- Reveal condition: after 2026-12-31, or earlier once H6-P1 through H6-P4 are decisively resolved without contaminating remaining tests.
+- H6 contains a priority counterexample: externally enforceable, materially costly, hard-to-reverse self-binding that actually blocks something the actor materially wants can outweigh several weaker favorable matches.
+
+### Verification after reveal
+
+When H6 is revealed, its exact canonical plaintext will be published verbatim. Anyone can compute SHA-256 over its UTF-8 bytes (LF line endings) and verify the commitment above.
+
 ### Anti-gaming rule
 
 If an actor under observation cites, links to, or demonstrably responds to Narrative Watch before a prediction resolves, affected predictions are marked `CONTAMINATED`. They do **not** count as clean confirmation, even if the subsequent behavior matches the prediction.

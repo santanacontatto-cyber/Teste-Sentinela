@@ -1,0 +1,36 @@
+name: DaVinci bridge checks
+
+on:
+  pull_request:
+    paths:
+      - 'davinci_bridge/**'
+      - '.github/workflows/davinci-bridge-check.yml'
+  push:
+    branches:
+      - davinci-bridge-v0
+    paths:
+      - 'davinci_bridge/**'
+      - '.github/workflows/davinci-bridge-check.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  syntax-and-transport:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Python syntax
+        run: python -m py_compile davinci_bridge/send_command.py davinci_bridge/install_windows.py davinci_bridge/test_protocol.py
+      - name: Offline mailbox round-trip
+        working-directory: davinci_bridge
+        run: python -m unittest -v test_protocol.py
+      - name: Lua 5.1 syntax
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq lua5.1
+          luac5.1 -p davinci_bridge/SentinelaBridge.lua
+          for f in davinci_bridge/modules/*.lua; do luac5.1 -p "$f"; done

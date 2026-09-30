@@ -1,0 +1,32 @@
+name: sentinela-transport
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'transport/commands/*.json'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sentinela-transport-${{ github.repository }}
+  cancel-in-progress: false
+
+jobs:
+  dispatch:
+    if: github.repository_visibility == 'private'
+    runs-on: [self-hosted, Windows, X64, sentinela]
+    timeout-minutes: 20
+    steps:
+      - name: Checkout mission commit
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 2
+      - name: Execute pinned local dispatcher
+        shell: cmd
+        run: >
+          python "%LOCALAPPDATA%\Sentinela_Transport\dispatcher.py"
+          --workspace "%GITHUB_WORKSPACE%"
+          --git-sha "%GITHUB_SHA%"

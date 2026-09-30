@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "mission_id": "mission-example-health-0001",
+  "workframe_id": "wf-example",
+  "mode": "read_only",
+  "instruction_authority": "NONE",
+  "steps": [
+    {
+      "id": "health",
+      "op": "health"
+    },
+    {
+      "id": "processes",
+      "op": "process_list",
+      "depends_on": [
+        "health"
+      ]
+    }
+  ]
+}

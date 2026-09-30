@@ -254,11 +254,13 @@ class Dispatcher:
                         results[sid] = {"status": "SKIPPED_DEPENDENCY"}
                         pending.remove(sid)
                         skipped.append(sid)
+            if not pending:
+                break
             ready = [
                 sid for sid in pending
                 if all(dep in results for dep in steps[sid].get("depends_on", []))
             ]
-            if not ready and pending:
+            if not ready:
                 if skipped:
                     continue
                 raise MissionError("dependency cycle detected")
